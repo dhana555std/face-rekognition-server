@@ -1,0 +1,74 @@
+//aws login link
+https://eu-north-1.signin.aws.amazon.com/oauth?client_id=arn%3Aaws%3Asignin%3A%3A%3Aconsole%2Fcanvas&code_challenge=pSOswRJn8XSjUQUDHmFyl-KaflV3fc4eeL8Y72mlf_I&code_challenge_method=SHA-256&response_type=code&redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3FhashArgs%3D%2523%26isauthcode%3Dtrue%26state%3DhashArgsFromTB_eu-north-1_c5b120e504b02a33&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEA0aCmV1LW5vcnRoLTEiRjBEAiBZRF6JvY%2FzwuyP%2FYaQfgRzBkfwECZjB%2Fk%2F0JkrbRIUVgIgB%2Fon6PznHQCMiAcwXPvedKR7iYG1CMX7qwnUAhDb3MQqkwIItv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARACGgw4MDI3NzAwNjQ0NzMiDCgOi0ZF8EBUAS2KPSrnAS%2FubhPEadgq348QCzal50Pm6diZX7lzRSgSfveyR9MtWs2nP3TSgGGjmswRvjSrBmHOC5eJBibHwH%2BminwRZ832h3Ivp44yY1IybrhcWGXfakkZArgUFmk6QLJ5nuw1UD4C7Yztbe3buaK%2F57it2pBhdAW45gWEEK1H3TPUTdE0X3WyaRIEZBektJRUl%2FOv5heyJsMrai7v0bGg7bVd%2BgAdXo5RMIlx2ck5%2FpS2kiOgqUt2ZoIW7iQdtdKEzBsAsRHrr4%2BlHRAlgEEgzQAaAKdZXq%2FwBP%2BQbiHvobWmNVHPPlm%2Bhjk%2FAzDiuZ2tBjqQAWlh1OOxHRQq4UQIIBhjuYvZdUZVJxTJljUPQMkjmy41VCzqcgpLUeMAdZa29XFFltL6hnF8y9kSJOIQry1R2t3gsVRv2KSGzt9EvJLxTI3EDN43NoK0FubYUjRGQIk%2Fniqu6JU8h1O9JZEOefqmsbRBwtpfWmf1goDJLCGB4zYIzx3v1lgDm5tQ1cTVCefbiQ%3D%3D&X-Amz-Date=20240117T045230Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIA3V2GTCRMV3VPA7S3%2F20240117%2Feu-north-1%2Fsignin%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=717c2bdcd466c1859b9f22780a7c8a2d1035e58039f66f38747a0dfa6cfd90d7
+
+//to create the collection
+aws rekognition create-collection --collection-id "collectionName"
+
+//to delete the collection
+aws rekognition delete-collection --collection-id "collectionName"
+
+//to list the collection
+aws rekognition list-collections
+
+//to indedx the faces to our collection
+aws rekognition index-faces --image "S3Object={Bucket=rekophotos,Name=some.jpg}" --collection-id employees
+
+//to list indexed faces inside collection
+aws rekognition list-faces --collection-id employees
+
+//to check s3 face matches with collection faces or not
+aws rekognition search-faces-by-image --image {"S3Object":{"Bucket":"rekophotos","Name":"some.jpg"}} --collection-id employees
+
+
+//collection features
+associate-faces                          | compare-faces
+copy-project-version                     | create-collection
+create-dataset                           | create-face-liveness-session
+create-project                           | create-project-version
+create-stream-processor                  | create-user
+delete-collection                        | delete-dataset
+delete-faces                             | delete-project
+delete-project-policy                    | delete-project-version
+delete-stream-processor                  | delete-user
+describe-collection                      | describe-dataset
+describe-project-versions                | describe-projects
+describe-stream-processor                | detect-custom-labels
+detect-faces                             | detect-labels
+detect-moderation-labels                 | detect-protective-equipment
+detect-text                              | disassociate-faces
+distribute-dataset-entries               | get-celebrity-info
+get-celebrity-recognition                | get-content-moderation
+get-face-detection                       | get-face-liveness-session-results
+get-face-search                          | get-label-detection
+get-media-analysis-job                   | get-person-tracking
+get-segment-detection                    | get-text-detection
+index-faces                              | list-collections
+list-dataset-entries                     | list-dataset-labels
+list-faces                               | list-media-analysis-jobs
+list-project-policies                    | list-stream-processors
+list-tags-for-resource                   | list-users
+put-project-policy                       | recognize-celebrities
+search-faces                             | search-faces-by-image
+search-users                             | search-users-by-image
+start-celebrity-recognition              | start-content-moderation
+start-face-detection                     | start-face-search
+start-label-detection                    | start-media-analysis-job
+start-person-tracking                    | start-project-version
+start-segment-detection                  | start-stream-processor
+start-text-detection                     | stop-project-version
+stop-stream-processor                    | tag-resource
+untag-resource                           | update-dataset-entries
+update-stream-processor                  | wait
+help
+
+
+aws rekognition search-faces-by-image \
+    --collection-id "your-collection-id" \
+    --image '{"Bytes": "'$( base64 C:\Users\al5637\Downloads\passport.png | tr -d '\n' )'"}' \
+    --face-match-threshold 90
+	
+aws rekognition search-faces-by-image --collection-id "employees" --image '{"Bytes": "'$( base64 C:\Users\al5637\Downloads\passport.png | tr -d '\n' )'"}' --face-match-threshold 90
+
+aws rekognition search-faces-by-image \
+    --image '{"S3Object":{"Bucket":"rekophotos","Name":"some.jpg"}}' \
+    --collection-id employees
