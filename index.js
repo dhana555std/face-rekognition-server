@@ -13,11 +13,12 @@ const port = 8080;
 app.use(cors(corsOptions));
 var corsOptions = {
     origin: 'http://localhost:3000',
+    // origin: 'https://d3g06b3ac2s7ts.cloudfront.net/',
     optionsSuccessStatus: 200
 }
 
-app.use(bodyParser.raw()); 
-const storage = multer.memoryStorage(); 
+app.use(bodyParser.raw());
+const storage = multer.memoryStorage();
 const files = multer({ storage });
 
 app.post('/upload', files.single('file'), async (req, res) => {
@@ -31,30 +32,30 @@ app.post('/upload', files.single('file'), async (req, res) => {
 
         const fileExtension = path.extname(image.originalname).toLowerCase();
 
-        if(!process.env.VALID_IMAGE_EXTENSIONS.includes(fileExtension)){
+        if (!process.env.VALID_IMAGE_EXTENSIONS.includes(fileExtension)) {
             return res.status(415).send('File type not supportd, .png/.PNG/.jpg/.JPG/.jpeg/.JPEG expected');
         }
-    
+
         const filePath = await saveFileInTemp(image, fileExtension);
-        const facerekognitionResponse  = await searchFaces(filePath);
+        const facerekognitionResponse = await searchFaces(filePath);
 
         const endingTime = new Date();
-        const secondsDifference = ((endingTime.getTime() 
-        - startingTime.getTime()) / 1000);
+        const secondsDifference = ((endingTime.getTime()
+            - startingTime.getTime()) / 1000);
         console.log(`Time difference: ${secondsDifference} seconds`);
 
         res.status(200).send(facerekognitionResponse);
-        
+
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal server error');
     }
 });
 
-async function saveFileInTemp(image, fileExtension){
+async function saveFileInTemp(image, fileExtension) {
     const imageBuffer = image.buffer;
     const tempDirectory = os.tmpdir();
-    const filename = 'image-' + Date.now() + fileExtension; 
+    const filename = 'image-' + Date.now() + fileExtension;
     const filePath = path.join(tempDirectory, filename);
     await fs.writeFileSync(filePath, imageBuffer);
     console.log(`File saved at location ${filePath}`);

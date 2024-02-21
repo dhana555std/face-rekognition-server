@@ -15,31 +15,29 @@ const rekognition = new Rekognition({
 
 export async function searchFaces(localImagePath) {
 
-const localImageBytes = fs.readFileSync(localImagePath);
-const targetImage = {
-  Bytes: localImageBytes,
-};
+  const localImageBytes = fs.readFileSync(localImagePath);
+  const targetImage = {
+    Bytes: localImageBytes,
+  };
 
-const params = {
-  Image:targetImage,
-CollectionId: process.env.COLLECTION_ID
-};
+  const params = {
+    Image: targetImage,
+    CollectionId: process.env.COLLECTION_ID
+  };
 
   try {
     const data = await rekognition.searchFacesByImage(params);
-    if (data.FaceMatches.length > 0 && data.FaceMatches[0].Similarity>90) {
+    fs.unlinkSync(localImagePath);
+    if (data.FaceMatches.length > 0 && data.FaceMatches[0].Similarity > 90) {
       const externalImageId = data.FaceMatches[0].Face.ExternalImageId;
-      const idOfPerson= externalImageId.slice(0, externalImageId.lastIndexOf('.'));
+      const idOfPerson = externalImageId.slice(0, externalImageId.lastIndexOf('.'));
       await logDataToDb(idOfPerson);
       return data.FaceMatches;
     } else {
-      return {"message" : "No matching faces found in the collection."};
+      return { "message": "No matching faces found in the collection." };
     }
   } catch (err) {
     console.error("Error searching faces:", err);
     return err;
   }
 }
-
-
-
