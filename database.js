@@ -1,6 +1,6 @@
 import mysql from 'mysql2';
 import dotenv from "dotenv";
-
+import util from 'util'; // Import the 'util' module for promisify
 const environment = process.env.ENV || "development";
 console.log(`Environment is ${environment}`);
 dotenv.config({
@@ -32,7 +32,7 @@ export async function logDataToDb(userId) {
     const timeStamp = await getFormattedTimestamp();
     // console.log(timeStamp); // Output: 2024-01-16T13:46:54.789 
     if (userId) {
-      connection.query('INSERT INTO user_logs (userId, date_column) VALUES (?, ?)',
+      connection.query('INSERT INTO attendance (employeeId, date_column) VALUES (?, ?)',
         [userId, timeStamp], (error, results, fields) => {
           if (error) throw error;
           console.log('Results:', results);
@@ -42,6 +42,30 @@ export async function logDataToDb(userId) {
     connection.end();
   });
 }
+
+//added new function getEmployeeData
+export async function getEmployeeData(empId) {
+  const connection = await getConnection();
+  const queryAsync = util.promisify(connection.query).bind(connection);
+
+  try {
+    const results = await queryAsync('SELECT * FROM boomi.employees WHERE emp_id = ?', [empId]);
+
+    if (results.length > 0) {
+      // console.log('Employee data:', results[0]);
+      return results[0]; // Return the employee data
+    } else {
+      console.log('Employee not found with ID:', empId);
+      return null; // Return null or handle the absence of employee data as needed
+    }
+  } catch (error) {
+    console.error('Error executing query:', error);
+    throw error; // You may choose to handle or propagate the error as needed
+  } finally {
+    connection.end(); // Ensure the database connection is closed
+  }
+}
+
 
 async function getFormattedTimestamp() {
   const now = new Date();
@@ -58,3 +82,5 @@ async function getFormattedTimestamp() {
 }
 
 await logDataToDb();
+// Example usage
+await getEmployeeData();

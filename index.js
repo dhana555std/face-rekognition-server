@@ -8,7 +8,7 @@ import cors from 'cors';
 import { searchFaces } from "./compareLocalFacesWithCollection.js";
 
 const app = express();
-const port = 8080;
+const port = 8081;
 
 app.use(cors(corsOptions));
 var corsOptions = {
@@ -38,13 +38,13 @@ app.post('/upload', files.single('file'), async (req, res) => {
 
         const filePath = await saveFileInTemp(image, fileExtension);
         const facerekognitionResponse = await searchFaces(filePath);
-
+        console.log(facerekognitionResponse);
         const endingTime = new Date();
         const secondsDifference = ((endingTime.getTime()
             - startingTime.getTime()) / 1000);
         console.log(`Time difference: ${secondsDifference} seconds`);
 
-        res.status(200).send(facerekognitionResponse);
+        res.status(200).send(JSON.stringify(facerekognitionResponse));
 
     } catch (error) {
         console.error(error);

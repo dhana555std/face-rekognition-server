@@ -1,7 +1,7 @@
 import { Rekognition } from "@aws-sdk/client-rekognition";
 import fs from 'fs';
 import dotenv from "dotenv";
-import { logDataToDb } from "./database.js"
+import { logDataToDb,getEmployeeData } from "./database.js"
 
 const environment = process.env.ENV || "development";
 console.log(`Environment is ${environment}`);
@@ -32,7 +32,8 @@ export async function searchFaces(localImagePath) {
       const externalImageId = data.FaceMatches[0].Face.ExternalImageId;
       const idOfPerson = externalImageId.slice(0, externalImageId.lastIndexOf('.'));
       await logDataToDb(idOfPerson);
-      return data.FaceMatches;
+      const emplyoeeData = await getEmployeeData(idOfPerson);
+      return emplyoeeData;
     } else {
       return { "message": "No matching faces found in the collection." };
     }

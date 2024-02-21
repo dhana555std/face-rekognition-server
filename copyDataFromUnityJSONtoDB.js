@@ -65,4 +65,4 @@ async function uploadProfilePics(profilePics) {
 }
 
 await insertEmployeeData(employeeData);
-await uploadProfilePics(profilePics);
+// await uploadProfilePics(profilePics);
