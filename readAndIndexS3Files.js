@@ -15,19 +15,28 @@ const rekognition = new Rekognition({
 });
 
 async function getImageFilenames() {
-  const params = {
-    Bucket: process.env.BUCKET_NAME,
-    Prefix: process.env.IMAGES_DIRECTORY_PATH
-  };
+  const s3Client = new S3Client();
+  let imageFilenames = [];
+  let isTruncated = true;
+  let continuationToken = undefined;
 
   try {
+    while (isTruncated) {
+      const data = await s3Client.send(new ListObjectsV2Command({ 
+        Bucket: process.env.BUCKET_NAME, 
+        Prefix: process.env.IMAGES_DIRECTORY_PATH,
+        ContinuationToken: continuationToken
+      }));
+      
+      imageFilenames.push(...data.Contents
+        .filter(({ Key }) => Key.endsWith('.jpg') || Key.endsWith('.png') || Key.endsWith('.JPG') || Key.endsWith('.PNG'))
+        .map((object) => object.Key.split('/').pop().slice(0,object.Key.lastIndexOf('.'))));
 
-    const data = await s3.listObjectsV2(params).promise();
-    const imageFilenames = data.Contents
-      .filter(({ Key }) => Key.endsWith('.jpg') || Key.endsWith('.png') || Key.endsWith('.JPG') || Key.endsWith('.PNG'))
-      .map((object) => object.Key.split('/').pop().slice(0, object.Key.lastIndexOf('.')));
+      isTruncated = data.IsTruncated;
+      continuationToken = data.NextContinuationToken;
+    }
+
     return imageFilenames;
-
   } catch (error) {
     console.error('Error retrieving filenames:', error);
     throw error;

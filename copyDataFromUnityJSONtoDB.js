@@ -8,8 +8,8 @@ const employees = JSON.parse(jsonData);
 
 // Extract required fields
 const employeeData = employees.map(employee => {
-    const { emp_id, email, data_source, location, firstname, middlename, lastname } = employee;
-    return { emp_id, email, data_source, location, firstname, middlename, lastname };
+    const { emp_id, email, data_source, location, firstname, middlename, lastname ,reporting_manager} = employee;
+    return { emp_id, email, data_source, location, firstname, middlename, lastname ,reporting_manager };
 });
 
 // Separate profile pics
@@ -30,8 +30,9 @@ export async function insertEmployeeData(employeeData) {
         console.log('Connected to the database');
 
         for (const employee of employeeData) {
-            connection.query('INSERT INTO employees (emp_id, email, location, firstname, middlename, lastname, created_by, updated_by, display_name) VALUES (?,?,?,?,?,?,?,?,?)',
-                [employee.emp_id, employee.email, employee.location[1], employee.firstname, employee.middlename, employee.lastname, employee.data_source, employee.data_source, `${employee.firstname} ${employee.lastname}`], (error, results, fields) => {
+            console.log("this is managerName",employee.reporting_manager)
+            connection.query('INSERT INTO employees (emp_id, email, location, firstname, middlename, lastname, created_by, updated_by, display_name, reporting_manager) VALUES (?,?,?,?,?,?,?,?,?,?)',
+                [employee.emp_id, employee.email, employee.location[1], employee.firstname, employee.middlename, employee.lastname, employee.data_source, employee.data_source, `${employee.firstname} ${employee.lastname}` , employee.reporting_manager], (error, results, fields) => {
                     if (error) throw error;
                     console.log('Inserted employee:', employee.emp_id);
                 });

@@ -2,6 +2,7 @@ import { Rekognition } from "@aws-sdk/client-rekognition";
 import fs from 'fs';
 import dotenv from "dotenv";
 import { logDataToDb,getEmployeeData } from "./database.js"
+import {sendEmailNotification} from "./sendEmailNotification.js";
 
 const environment = process.env.ENV || "development";
 console.log(`Environment is ${environment}`);
@@ -27,12 +28,15 @@ export async function searchFaces(localImagePath) {
 
   try {
     const data = await rekognition.searchFacesByImage(params);
+    console.log("this is data", data)
     fs.unlinkSync(localImagePath);
     if (data.FaceMatches.length > 0 && data.FaceMatches[0].Similarity > 90) {
       const externalImageId = data.FaceMatches[0].Face.ExternalImageId;
       const idOfPerson = externalImageId.slice(0, externalImageId.lastIndexOf('.'));
-      await logDataToDb(idOfPerson);
       const emplyoeeData = await getEmployeeData(idOfPerson);
+      const email = emplyoeeData.email;
+      await logDataToDb(idOfPerson,email);
+      await sendEmailNotification(emplyoeeData.reporting_manager);
       return emplyoeeData;
     } else {
       return { "message": "No matching faces found in the collection." };
