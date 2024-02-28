@@ -18,7 +18,7 @@ export async function sendEmailNotification(reporting_manager) {
       const mailOptions = {
         from: process.env.GMAIL_ADMIN_ID,
         // to: `${managerEmail}@accionlabs.com`,
-        to: `mandepally.shivasai@accionlabs.com`,
+        to: `umesh.belge@accionlabs.com`,
         subject: 'New Attendance Record Added',
         text: `A new attendance record has been added: ${timeStamp}` 
       };
